@@ -1,4 +1,5 @@
 import boto3
+import uuid
 from PIL import Image
 from io import BytesIO
 import os
@@ -7,6 +8,9 @@ s3 = boto3.client('s3')
 
 def lambda_handler(event, context):
     # Get bucket and object key from the event
+    print("📌 Unique Invocation ID:", str(uuid.uuid4()))
+    print("📦 Event:", json.dumps(event, indent=2))
+    print("🧾 Request ID:", context.aws_request_id)
     source_bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
     destination_bucket = source_bucket  # same bucket (or use a different one)
