@@ -1,0 +1,42 @@
+name: Terraform Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan -out=tfplan.binary > tfplan.txt
+          PLAN_SUMMARY=$(terraform show -no-color tfplan.binary)
+          echo "$PLAN_SUMMARY"
+          echo "::set-output name=summary::$PLAN_SUMMARY"
+
+      - name: Terraform Apply (only if changes)
+        if: steps.plan.outputs.summary != '' && !contains(steps.plan.outputs.summary, 'No changes.')
+        run: |
+          terraform apply -auto-approve tfplan.binary
