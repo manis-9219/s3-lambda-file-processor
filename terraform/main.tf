@@ -35,6 +35,7 @@ resource "aws_lambda_function" "lambda" {
     runtime = "python3.12"
     filename         = "${path.module}/../lambda/lambda_function.zip"
     source_code_hash = filebase64sha256("${path.module}/../lambda/lambda_function.zip")
+    layers = [aws_lambda_layer_version.my_layer.arn]  # ADDED
 }
 
 // Configure S3 bucket to send notifications to Lambda on object creation events
@@ -80,6 +81,7 @@ resource "aws_iam_role_policy" "lambda_logs" {
   })
 }
 
+// s3 access
 resource "aws_iam_role_policy" "lambda_s3_access" {
   name = "lambda-s3-access"
   role = aws_iam_role.lambda_exec.id
@@ -102,6 +104,15 @@ resource "aws_iam_role_policy" "lambda_s3_access" {
     ]
   })
 }
+
+// lambda layer 
+resource "aws_lambda_layer_version" "my_layer" {
+  layer_name          = "my-pillow-dependency-layer"
+  compatible_runtimes = ["python3.12"]
+  filename            = "${path.module}/../lambda/pillow-layer.zip"  # Adjust path as needed
+  source_code_hash    = filebase64sha256("${path.module}/../lambda/pillow-layer.zip")
+}
+
 
 
  
