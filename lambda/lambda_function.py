@@ -14,7 +14,7 @@ def lambda_handler(event, context):
     print("🧾 Request ID:", context.aws_request_id)
     source_bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
-    destination_bucket = source_bucket  # same bucket (or use a different one)
+    destination_bucket = "my-lambda-trigger-target-bucket"  # same bucket (or use a different one)
     filename = os.path.basename(key)  # strips off folder structure
     resized_key = f"resized/{filename}"
 

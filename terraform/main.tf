@@ -45,7 +45,6 @@ resource "aws_s3_bucket_notification" "notify" {
   lambda_function {
     lambda_function_arn = aws_lambda_function.lambda.arn
     events              = ["s3:ObjectCreated:*"]
-    filter_prefix = "Upload/"    # root only
   }
 
   // Ensure Lambda permission is created before notification
@@ -99,7 +98,9 @@ resource "aws_iam_role_policy" "lambda_s3_access" {
         ],
         Resource = [
           aws_s3_bucket.bucket.arn,
-          "${aws_s3_bucket.bucket.arn}/*"
+          "${aws_s3_bucket.bucket.arn}/*",
+          aws_s3_bucket.target_bucket.arn,
+          "${aws_s3_bucket.target_bucket.arn}/*",
         ]
       }
     ]
@@ -116,4 +117,7 @@ resource "aws_lambda_layer_version" "my_layer" {
 
 
 
- 
+ // creating the target_bucket 
+ resource "aws_s3_bucket" "target_bucket" {
+    bucket = "my-lambda-trigger-target-bucket"
+}
