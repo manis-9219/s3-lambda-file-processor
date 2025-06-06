@@ -1,5 +1,6 @@
 import boto3
 import uuid
+import json
 from PIL import Image
 from io import BytesIO
 import os
